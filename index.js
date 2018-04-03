@@ -6,13 +6,13 @@ const { main } = require('./weather');
 const { getCityWeather } = require('./requests');
 
 var city = 'London';
-var country = 'UK';
+var countryCode = 'UK';
 
 app.get('/api/', createRxMiddleware((req$) =>
   req$
     .mergeMap(() =>
       Observable
-        .fromPromise(getCityWeather({ country, city }))
+        .fromPromise(getCityWeather({ countryCode, city }))
         .catch((err) => {
           console.error('Couldnt get weather')
         })
