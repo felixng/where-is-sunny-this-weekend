@@ -1,11 +1,16 @@
 const db = require('./db');
+const moment = require('moment');
 
-const saveCityWeather = body => {
+const dateFormat = 'DD-MM-YYYY';
+
+const saveCityWeather = day => {
   return new Promise((res, rej) => {
-    const ts = Math.round(new Date().getTime() / 1000);
-    const row = [ts, 'London', 'GB', body];
+    var currentDate = moment().format(dateFormat);
+    var forecastDate = moment.unix(day.date.epoch).format(dateFormat);
+    const row = [currentDate, forecastDate, 'London', 'GB', day, moment()];
     const sql =
-      'INSERT INTO city_weathers(date, city, country, forecast) VALUES($1, $2, $3, $4) RETURNING *';
+      'INSERT INTO cityweathers(currentDate, forecastDate, city, countrycode, forecast, timestamp) VALUES($1, $2, $3, $4, $5, $6) RETURNING *';
+
     db
       .query(sql, row)
       .then(result => {
@@ -19,6 +24,16 @@ const saveCityWeather = body => {
   });
 };
 
+const extractCityWeather = body => {
+  if (body.forecast) {
+    var days = body.forecast.simpleforecast.forecastday;
+    return Promise.all(days.map(saveCityWeather));
+  }
+
+  console.error("API didn't return forecasts!");
+};
+
 module.exports = {
-  saveCityWeather
+  saveCityWeather,
+  extractCityWeather
 };

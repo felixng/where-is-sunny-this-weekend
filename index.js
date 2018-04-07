@@ -1,11 +1,13 @@
 const express = require('express');
+const dotenv = require('dotenv');
+const config = dotenv.config();
 const mountRoutes = require('./routes');
 const bodyParser = require('body-parser');
 const app = express();
 const { Observable } = require('rxjs');
 const { createRxMiddleware } = require('./utils/rx-middleware');
 const { main } = require('./weather');
-const { saveCityWeather } = require('./cityWeathers');
+const { extractCityWeather } = require('./cityWeathers');
 const { getCityWeather } = require('./requests');
 
 var city = 'London';
@@ -19,7 +21,7 @@ app.get(
   createRxMiddleware(req$ =>
     req$.mergeMap(() =>
       Observable.fromPromise(getCityWeather({ countryCode, city }))
-        .mergeMap(body => Observable.fromPromise(saveCityWeather(body)))
+        .mergeMap(body => Observable.fromPromise(extractCityWeather(body)))
         .catch(err => {
           console.error('Couldnt get weather');
           console.log(err);
