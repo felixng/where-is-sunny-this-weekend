@@ -1,32 +1,40 @@
 const express = require('express');
+const mountRoutes = require('./routes');
+const bodyParser = require('body-parser');
 const app = express();
 const { Observable } = require('rxjs');
 const { createRxMiddleware } = require('./utils/rx-middleware');
 const { main } = require('./weather');
+const { saveCityWeather } = require('./cityWeathers');
 const { getCityWeather } = require('./requests');
 
 var city = 'London';
 var countryCode = 'UK';
 
-app.get('/api/', createRxMiddleware((req$) =>
-  req$
-    .mergeMap(() =>
-      Observable
-        .fromPromise(getCityWeather({ countryCode, city }))
-        .catch((err) => {
-          console.error('Couldnt get weather')
+app.use(bodyParser.json());
+mountRoutes(app);
+
+app.get(
+  '/api/',
+  createRxMiddleware(req$ =>
+    req$.mergeMap(() =>
+      Observable.fromPromise(getCityWeather({ countryCode, city }))
+        .mergeMap(body => Observable.fromPromise(saveCityWeather(body)))
+        .catch(err => {
+          console.error('Couldnt get weather');
+          console.log(err);
         })
     )
-));
+  )
+);
 
 // app.get('/', main);
 
-
 /**
-* Get the time table
-* params: void
-* return: Object
-*/
+ * Get the time table
+ * params: void
+ * return: Object
+ */
 // app.get('/api/table', createRxMiddleware((req$) =>
 //   req$
 //     .flatMap(() =>

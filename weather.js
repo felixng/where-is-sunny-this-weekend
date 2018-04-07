@@ -1,26 +1,23 @@
-const {
-    getCityWeather
-} = require('./requests');
+const { getCityWeather } = require('./requests');
 
 const main = () => {
-    getCityWeather({country: 'UK', city: 'London'})
-    .catch(err => {
-        let errorMessage;
+  getCityWeather({ country: 'UK', city: 'London' }).catch(err => {
+    let errorMessage;
 
-        if (typeof err === 'string') {
-            errorMessage = err;
-        }
+    if (typeof err === 'string') {
+      errorMessage = err;
+    }
 
-        if (err instanceof Error) {
-            errorMessage = err.message;
-        }
+    if (err instanceof Error) {
+      errorMessage = err.message;
+    }
 
-        if (typeof err === 'object' && err.Message) {
-            errorMessage = err.Message;
-        }
+    if (typeof err === 'object' && err.Message) {
+      errorMessage = err.Message;
+    }
 
-        console.error('Logged out, error: ', errorMessage);
-    })
+    console.error('error: ', errorMessage);
+  });
 };
 
 module.exports = {
