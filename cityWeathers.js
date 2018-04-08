@@ -14,7 +14,6 @@ const saveCityWeather = day => {
     db
       .query(sql, row)
       .then(result => {
-        //console.log(res.rows[0])
         return res(result.rows[0]);
       })
       .catch(e => {
