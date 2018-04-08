@@ -1,6 +1,6 @@
 // ./routes/index.js
-const cityWeathers = require('./cityWeather');
+const weathers = require('./weathers');
 
 module.exports = app => {
-  app.use('/cityWeather', cityWeathers);
+  app.use('/weathers', weathers);
 };
