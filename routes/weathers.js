@@ -17,8 +17,16 @@ router.get('/:id', async (req, res) => {
 
 router.get('/sunny/weekend', async (req, res) => {
   const { rows } = await db.query(
-    'SELECT * FROM weathers WHERE conditions LIKE $1',
-    [`%Clear%`]
+    'SELECT * FROM weathers WHERE conditions LIKE $1 and ("forecastDate" = $2 or "forecastDate" = $3)',
+    [
+      `%Clear%`,
+      moment()
+        .day(6)
+        .format('DD-MM-YYYY'),
+      moment()
+        .day(7)
+        .format('DD-MM-YYYY')
+    ]
   );
   res.send(rows);
 });
