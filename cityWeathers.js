@@ -10,8 +10,8 @@ const saveCityWeather = data => {
     const row = [
       currentDate,
       forecastDate,
-      'London',
-      'GB',
+      data.location.city,
+      data.location.country_iso3166,
       data.conditions,
       data.high.celsius,
       data.low.celsius,
@@ -46,6 +46,8 @@ const saveCityWeather = data => {
 const extractCityWeather = body => {
   if (body.forecast) {
     var days = body.forecast.simpleforecast.forecastday;
+    days.map(day => (day.location = body.location));
+
     return Promise.all(days.map(saveCityWeather));
   }
 

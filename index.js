@@ -8,10 +8,7 @@ const { Observable } = require('rxjs');
 const { createRxMiddleware } = require('./utils/rx-middleware');
 const { main } = require('./weather');
 const { extractCityWeather } = require('./cityWeathers');
-const { getCityWeather } = require('./requests');
-
-var city = 'London';
-var countryCode = 'UK';
+const { getCityWeather, getCityList } = require('./requests');
 
 app.use(bodyParser.json());
 mountRoutes(app);
@@ -20,8 +17,17 @@ app.get(
   '/api/',
   createRxMiddleware(req$ =>
     req$.mergeMap(() =>
-      Observable.fromPromise(getCityWeather({ countryCode, city }))
-        .mergeMap(body => Observable.fromPromise(extractCityWeather(body)))
+      Observable.fromPromise(getCityList())
+        .mergeMap(cities => {
+          return Observable.forkJoin(
+            ...cities.map(city =>
+              getCityWeather({
+                city: city.name,
+                countryCode: city.countrycode
+              }).then(extractCityWeather)
+            )
+          );
+        })
         .catch(err => {
           console.error('Couldnt get weather');
           console.log(err);
