@@ -6,6 +6,7 @@
   "main": "index.js",
   "scripts": {
     "migrate": "./node_modules/.bin/node-pg-migrate",
+    "start": "npm run migrate up && node index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "precommit": "lint-staged"
   },
