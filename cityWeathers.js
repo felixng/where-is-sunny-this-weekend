@@ -3,22 +3,42 @@ const moment = require('moment');
 
 const dateFormat = 'DD-MM-YYYY';
 
-const saveCityWeather = day => {
+const saveCityWeather = data => {
   return new Promise((res, rej) => {
     var currentDate = moment().format(dateFormat);
-    var forecastDate = moment.unix(day.date.epoch).format(dateFormat);
-    const row = [currentDate, forecastDate, 'London', 'GB', day, moment()];
-    const sql =
-      'INSERT INTO cityweathers(currentDate, forecastDate, city, countrycode, forecast, timestamp) VALUES($1, $2, $3, $4, $5, $6) RETURNING *';
+    var forecastDate = moment.unix(data.date.epoch).format(dateFormat);
+    const row = [
+      currentDate,
+      forecastDate,
+      'London',
+      'GB',
+      data.conditions,
+      data.high.celsius,
+      data.low.celsius,
+      data
+    ];
+
+    const sql = `INSERT INTO weathers("currentDate", 
+                            "forecastDate", 
+                            "city", 
+                            "countryCode", 
+                            "conditions",
+                            "high",
+                            "low",
+                            "raw") 
+       VALUES($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *`;
 
     db
       .query(sql, row)
       .then(result => {
         return res(result.rows[0]);
       })
-      .catch(e => {
-        console.error(e.stack);
-        return rej(e);
+      .catch(err => {
+        if (err.code == 23505) {
+          return res(err.detail);
+        }
+        // console.error(e.stack);
+        return rej(err);
       });
   });
 };

@@ -5,6 +5,7 @@
     "A simple web app that tells you where's sunny this weekend - for your last minute weekend getaway!",
   "main": "index.js",
   "scripts": {
+    "migrate": "./node_modules/.bin/node-pg-migrate",
     "test": "echo \"Error: no test specified\" && exit 1",
     "precommit": "lint-staged"
   },
@@ -28,6 +29,7 @@
     "express": "^4.16.3",
     "express-promise-router": "^3.0.1",
     "moment": "^2.22.0",
+    "node-pg-migrate": "^2.26.3",
     "pg": "^7.4.1",
     "request": "^2.85.0",
     "rxjs": "^5.5.8"
