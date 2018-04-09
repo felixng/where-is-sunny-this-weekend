@@ -18,7 +18,7 @@ router.get('/:id', async (req, res) => {
 
 router.get('/sunny/weekend', async (req, res) => {
   const { rows } = await db.query(
-    'SELECT * FROM weathers WHERE conditions LIKE $1 and ("forecastDate" = $2 or "forecastDate" = $3)',
+    'SELECT DISTINCT city FROM weathers WHERE conditions LIKE $1 and ("forecastDate" = $2 or "forecastDate" = $3)',
     [
       `%Clear%`,
       moment()
@@ -29,7 +29,7 @@ router.get('/sunny/weekend', async (req, res) => {
         .format('DD-MM-YYYY')
     ]
   );
-  res.send(rows);
+  res.send(rows.map(row => row.city));
 });
 
 // router.post('/', async (req, res) => {
