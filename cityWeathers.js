@@ -13,8 +13,8 @@ const saveCityWeather = data => {
       data.location.city,
       data.location.country_iso3166,
       data.conditions,
-      data.high.celsius,
-      data.low.celsius,
+      data.high.celsius.trim() == '' ? 0 : data.high.celsius.trim(),
+      data.low.celsius.trim() == '' ? 0 : data.low.celsius.trim(),
       data
     ];
 
