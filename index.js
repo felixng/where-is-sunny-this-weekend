@@ -7,7 +7,7 @@ const app = express();
 const { Observable } = require('rxjs');
 const { createRxMiddleware } = require('./utils/rx-middleware');
 const { main } = require('./weather');
-const { extractCityWeather } = require('./cityWeathers');
+const { extractCityWeather, filterCities } = require('./cityWeathers');
 const { getCityWeather, getCityList } = require('./requests');
 
 app.use(bodyParser.json());
@@ -18,12 +18,13 @@ app.get(
   createRxMiddleware(req$ =>
     req$.mergeMap(() =>
       Observable.fromPromise(getCityList())
+        .map(cities => filterCities(cities))
         .mergeMap(cities => {
           return Observable.forkJoin(
             ...cities.map(city =>
               getCityWeather({
                 city: city.name,
-                countryCode: city.countrycode
+                countryCode: city.isocountry
               }).then(extractCityWeather)
             )
           );

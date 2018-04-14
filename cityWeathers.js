@@ -37,10 +37,19 @@ const saveCityWeather = data => {
         if (err.code == 23505) {
           return res(err.detail);
         }
-        // console.error(e.stack);
-        return rej(err);
+        console.error(`error running sql query: ${sql}`);
+        console.error(e.stack);
+        return res(err);
       });
   });
+};
+
+const cityCriteria = row => {
+  return row.type === 'large_airport' && row.name !== 0 && row.isocountry !== 0;
+};
+
+const filterCities = rows => {
+  return rows.filter(cityCriteria);
 };
 
 const extractCityWeather = body => {
@@ -56,5 +65,6 @@ const extractCityWeather = body => {
 
 module.exports = {
   saveCityWeather,
-  extractCityWeather
+  extractCityWeather,
+  filterCities
 };
