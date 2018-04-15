@@ -37,7 +37,31 @@ const saveCityWeather = data => {
         if (err.code == 23505) {
           return res(err.detail);
         }
-        console.error(`error running sql query: ${sql}`);
+        console.error(`error running sql query: ${sql} and data: ${row}`);
+        console.error(e.stack);
+        return res(err);
+      });
+  });
+};
+
+const weatherNotExists = ({ city, countryCode }) => {
+  return new Promise((res, rej) => {
+    var currentDate = moment().format(dateFormat);
+
+    const row = [currentDate, city, countryCode];
+
+    const sql = `SELECT COUNT(*) FROM weathers WHERE 
+                            "currentDate" = $1 AND  
+                            "city" = $2 AND
+                            "countryCode" = $3`;
+
+    db
+      .query(sql, row)
+      .then(result => {
+        return res(result.rows[0].count == 0);
+      })
+      .catch(err => {
+        console.error(`error running sql query: ${sql} and data: ${row}`);
         console.error(e.stack);
         return res(err);
       });
@@ -66,5 +90,6 @@ const extractCityWeather = body => {
 module.exports = {
   saveCityWeather,
   extractCityWeather,
+  weatherNotExists,
   filterCities
 };

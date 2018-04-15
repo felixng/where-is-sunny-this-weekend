@@ -14,8 +14,18 @@ module.exports = {
         },
         (err, _, body) => {
           const parsedBody = JSON.parse(body);
+
           if (!err && _.statusCode === 200) {
             console.log('Get weather succeed with status code: ', _.statusCode);
+
+            if (parsedBody.location && parsedBody.location.city != city) {
+              console.log(
+                `Name mismatch - weathering API returning ${
+                  parsedBody.location.city
+                } instead of ${city}.  Overriding.`
+              );
+              parsedBody.location.city = city;
+            }
 
             return res(parsedBody);
           }

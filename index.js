@@ -7,7 +7,11 @@ const app = express();
 const { Observable } = require('rxjs');
 const { createRxMiddleware } = require('./utils/rx-middleware');
 const { main } = require('./weather');
-const { extractCityWeather, filterCities } = require('./cityWeathers');
+const {
+  weatherNotExists,
+  extractCityWeather,
+  filterCities
+} = require('./cityWeathers');
 const { getCityWeather, getCityList } = require('./requests');
 
 app.use(bodyParser.json());
@@ -21,14 +25,32 @@ app.get(
         .map(cities => filterCities(cities))
         .mergeMap(cities => {
           return Observable.forkJoin(
-            ...cities.map(city =>
-              getCityWeather({
-                city: city.name,
-                countryCode: city.isocountry
-              }).then(extractCityWeather)
-            )
+            ...cities
+              .filter(city =>
+                weatherNotExists({
+                  city: city.name,
+                  countryCode: city.isocountry
+                })
+              )
+              .slice(1, 100)
+              .map(city =>
+                getCityWeather({
+                  city: city.name,
+                  countryCode: city.isocountry
+                }).then(extractCityWeather)
+              )
           );
         })
+        // .mergeMap(cities => {
+        //   return Observable.forkJoin(
+        //     ...cities.map(city =>
+        // getCityWeather({
+        //   city: city.name,
+        //   countryCode: city.isocountry
+        // }).then(extractCityWeather)
+        //     )
+        //   );
+        // })
         .catch(err => {
           console.error('Couldnt get weather');
           console.log(err);
