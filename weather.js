@@ -1,4 +1,4 @@
-const { getCityWeather } = require('./requests');
+const { getCityWeather } = require('./wunderground-requests');
 
 const main = () => {
   getCityWeather({ country: 'UK', city: 'London' }).catch(err => {

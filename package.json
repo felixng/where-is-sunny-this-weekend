@@ -32,6 +32,7 @@
     "moment": "^2.22.0",
     "node-pg-migrate": "^2.26.3",
     "pg": "^7.4.1",
+    "promise-throttle": "^1.0.0",
     "request": "^2.85.0",
     "rxjs": "^5.5.8"
   },

@@ -11,8 +11,18 @@ const {
   weatherNotExists,
   extractCityWeather,
   filterCities
-} = require('./cityWeathers');
-const { getCityWeather, getCityList } = require('./requests');
+} = require('./weather-repo');
+const { getCityWeather, getCityList } = require('./wunderground-requests');
+
+var PromiseThrottle = require('promise-throttle');
+
+//Throttling 10 calls per minute
+var promiseThrottle = new PromiseThrottle({
+  requestsPerSecond: 0.16,
+  promiseImplementation: Promise
+});
+
+promiseThrottle.add(getCityWeather);
 
 app.use(bodyParser.json());
 mountRoutes(app);
@@ -32,25 +42,19 @@ app.get(
                   countryCode: city.isocountry
                 })
               )
-              .slice(1, 100)
+              .slice(11, 30)
               .map(city =>
-                getCityWeather({
-                  city: city.name,
-                  countryCode: city.isocountry
-                }).then(extractCityWeather)
+                promiseThrottle
+                  .add(
+                    getCityWeather.bind(this, {
+                      city: city.name,
+                      countryCode: city.isocountry
+                    })
+                  )
+                  .then(extractCityWeather)
               )
           );
         })
-        // .mergeMap(cities => {
-        //   return Observable.forkJoin(
-        //     ...cities.map(city =>
-        // getCityWeather({
-        //   city: city.name,
-        //   countryCode: city.isocountry
-        // }).then(extractCityWeather)
-        //     )
-        //   );
-        // })
         .catch(err => {
           console.error('Couldnt get weather');
           console.log(err);
