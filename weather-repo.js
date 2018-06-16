@@ -51,19 +51,22 @@ const weatherNotExists = ({ city, countryCode }) => {
     const row = [currentDate, city, countryCode];
 
     const sql = `SELECT COUNT(*) FROM weathers WHERE 
-                            "currentDate" = $1 AND  
-                            "city" = $2 AND
-                            "countryCode" = $3`;
+                          "currentDate" = $1 AND  
+                          "city" = $2 AND
+                          "countryCode" = $3`;
 
     db
       .query(sql, row)
       .then(result => {
+        console.log(
+          `Weather Not Exist for ${city}: ${result.rows[0].count == 0}`
+        );
         return res(result.rows[0].count == 0);
       })
       .catch(err => {
         console.error(`error running sql query: ${sql} and data: ${row}`);
         console.error(e.stack);
-        return res(err);
+        return rej(err);
       });
   });
 };
@@ -84,6 +87,7 @@ const extractCityWeather = body => {
     return Promise.all(days.map(saveCityWeather));
   }
 
+  return body;
   console.error("API didn't return forecasts!");
 };
 

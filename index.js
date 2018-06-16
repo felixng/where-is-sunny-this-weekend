@@ -36,14 +36,19 @@ app.get(
         .mergeMap(cities => {
           return Observable.forkJoin(
             ...cities
-              .filter(city =>
-                weatherNotExists({
-                  city: city.name,
-                  countryCode: city.isocountry
-                })
-              )
-              .slice(11, 30)
-              .map(city =>
+              .slice(1, 5)
+              // .filter(city =>
+              //   weatherNotExists({
+              //     city: city.name,
+              //     countryCode: city.isocountry
+              //   }).then( result => {
+              //     console.log(result);
+              //     return result;
+              //   })
+              // )
+              .map((
+                city //console.log(city.name)
+              ) =>
                 promiseThrottle
                   .add(
                     getCityWeather.bind(this, {
@@ -63,7 +68,7 @@ app.get(
   )
 );
 
-// app.get('/', main);
+app.get('/', main);
 
 /**
  * Get the time table
