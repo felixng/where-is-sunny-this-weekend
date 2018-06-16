@@ -1,7 +1,7 @@
 const { getCityWeather } = require('./wunderground-requests');
 
 const main = () => {
-  getCityWeather({ country: 'UK', city: 'London' }).catch(err => {
+  getCityWeather({ countryCode: 'UK', city: 'London' }).catch(err => {
     let errorMessage;
 
     if (typeof err === 'string') {
