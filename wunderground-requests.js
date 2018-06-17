@@ -12,21 +12,25 @@ const getCityWeatherExternal = ({ countryCode, city }) => {
         url: forecast10daysUrl + `/${countryCode}/${city}.json`
       },
       (err, _, body) => {
-        const parsedBody = JSON.parse(body);
+        try {
+          const parsedBody = JSON.parse(body);
 
-        if (!err && _.statusCode === 200) {
-          console.log('Get weather succeed with status code: ', _.statusCode);
+          if (!err && _.statusCode === 200) {
+            console.log('Get weather succeed with status code: ', _.statusCode);
 
-          if (parsedBody.location && parsedBody.location.city != city) {
-            console.log(
-              `Name mismatch - weathering API returning ${
-                parsedBody.location.city
-              } instead of ${city}.  Overriding.`
-            );
-            parsedBody.location.city = city;
+            if (parsedBody.location && parsedBody.location.city != city) {
+              console.log(
+                `Name mismatch - weathering API returning ${
+                  parsedBody.location.city
+                } instead of ${city}.  Overriding.`
+              );
+              parsedBody.location.city = city;
+            }
+
+            return res(parsedBody);
           }
-
-          return res(parsedBody);
+        } catch (e) {
+          console.log("API didn't return proper JSON: ", e);
         }
 
         console.error(`Couldn't get weather with status code: ${_.statusCode}`);
@@ -38,14 +42,13 @@ const getCityWeatherExternal = ({ countryCode, city }) => {
 
 module.exports = {
   getCityWeather({ countryCode, city }) {
-    // console.log(forecast10daysUrl + `/${countryCode}/${city}.json`);
     return new Promise((res, rej) => {
       weatherNotExists({ countryCode, city }).then(notExist => {
-        console.log(`${city}: not exist? = ${notExist}`);
         if (notExist) {
           return res(getCityWeatherExternal({ countryCode, city }));
         }
-        return res(`${city} already has data for the today.`);
+
+        return rej(`${city} already has data for the today.`);
       });
     });
   },

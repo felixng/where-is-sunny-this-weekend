@@ -6,7 +6,7 @@ const bodyParser = require('body-parser');
 const app = express();
 const { Observable } = require('rxjs');
 const { createRxMiddleware } = require('./utils/rx-middleware');
-const { main } = require('./weather');
+const { main } = require('./main');
 const {
   weatherNotExists,
   extractCityWeather,
@@ -22,8 +22,6 @@ var promiseThrottle = new PromiseThrottle({
   promiseImplementation: Promise
 });
 
-promiseThrottle.add(getCityWeather);
-
 app.use(bodyParser.json());
 mountRoutes(app);
 
@@ -35,29 +33,16 @@ app.get(
         .map(cities => filterCities(cities))
         .mergeMap(cities => {
           return Observable.forkJoin(
-            ...cities
-              .slice(1, 5)
-              // .filter(city =>
-              //   weatherNotExists({
-              //     city: city.name,
-              //     countryCode: city.isocountry
-              //   }).then( result => {
-              //     console.log(result);
-              //     return result;
-              //   })
-              // )
-              .map((
-                city //console.log(city.name)
-              ) =>
-                promiseThrottle
-                  .add(
-                    getCityWeather.bind(this, {
-                      city: city.name,
-                      countryCode: city.isocountry
-                    })
-                  )
-                  .then(extractCityWeather)
-              )
+            ...cities.slice(1, 10).map(city =>
+              promiseThrottle
+                .add(
+                  getCityWeather.bind(this, {
+                    countryCode: city.isocountry,
+                    city: city.name
+                  })
+                )
+                .then(extractCityWeather)
+            )
           );
         })
         .catch(err => {
