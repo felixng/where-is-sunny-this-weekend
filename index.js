@@ -33,7 +33,7 @@ app.get(
         .map(cities => filterCities(cities))
         .mergeMap(cities => {
           return Observable.forkJoin(
-            ...cities.slice(1, 10).map(city =>
+            ...cities.slice(1, 30).map(city =>
               promiseThrottle
                 .add(
                   getCityWeather.bind(this, {
@@ -53,7 +53,9 @@ app.get(
   )
 );
 
-app.get('/', main);
+app.get('/', (req, res) => {
+  res.sendState(202);
+});
 
 /**
  * Get the time table
