@@ -48,7 +48,7 @@ module.exports = {
           return res(getCityWeatherExternal({ countryCode, city }));
         }
 
-        return rej(`${city} already has data for the today.`);
+        return res(`${city} already has data for the today.`);
       });
     });
   },
