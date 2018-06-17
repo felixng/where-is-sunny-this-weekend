@@ -57,24 +57,5 @@ app.get('/', (req, res) => {
   res.sendState(202);
 });
 
-/**
- * Get the time table
- * params: void
- * return: Object
- */
-// app.get('/api/table', createRxMiddleware((req$) =>
-//   req$
-//     .flatMap(() =>
-//       Observable
-//         .fromPromise(login({ shouldSetCookies: true }).then(() => login({ email, password })))
-//         .flatMap(() => Observable.fromPromise(getGymboxTimeTable()))
-//         .flatMap(extractTimeTable)
-//         .catch((err) => {
-//           console.error('Couldnt get the time table')
-//           // throw new Error(err);
-//         })
-//     )
-// ));
-
 // Start the app and listen on port 3000
 app.listen(3000);
