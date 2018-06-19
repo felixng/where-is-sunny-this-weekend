@@ -1,7 +1,40 @@
 const db = require('./db');
 const moment = require('moment');
-
 const dateFormat = 'DD-MM-YYYY';
+
+const getClearCityList = () => {
+  return new Promise((res, rej) => {
+    var currentDate = moment().format(dateFormat);
+    var comingSaturday = moment()
+      .day(6)
+      .format(dateFormat);
+    var comingSunday = moment()
+      .day(7)
+      .format(dateFormat);
+
+    const row = [currentDate, comingSaturday, comingSunday];
+
+    const sql = `SELECT "city" FROM weathers 
+                  WHERE "currentDate" = $1 
+                  AND ("forecastDate" = $2 OR "forecastDate" = $3) 
+                  AND "conditions" = 'Clear' 
+                  ORDER BY high DESC`;
+
+    db
+      .query(sql, row)
+      .then(result => {
+        return res(result.rows);
+      })
+      .catch(err => {
+        if (err.code == 23505) {
+          return res(err.detail);
+        }
+        console.error(`error running sql query: ${sql} and data: ${row}`);
+        console.error(e.stack);
+        return res(err);
+      });
+  });
+};
 
 const saveCityWeather = data => {
   return new Promise((res, rej) => {
@@ -92,6 +125,7 @@ const extractCityWeather = body => {
 };
 
 module.exports = {
+  getClearCityList,
   saveCityWeather,
   extractCityWeather,
   weatherNotExists,

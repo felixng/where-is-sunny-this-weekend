@@ -8,6 +8,7 @@ const { Observable } = require('rxjs');
 const { createRxMiddleware } = require('./utils/rx-middleware');
 const { main } = require('./main');
 const {
+  getClearCityList,
   weatherNotExists,
   extractCityWeather,
   filterCities
@@ -26,7 +27,7 @@ app.use(bodyParser.json());
 mountRoutes(app);
 
 app.get(
-  '/api/',
+  '/fetch/',
   createRxMiddleware(req$ =>
     req$.mergeMap(() =>
       Observable.fromPromise(getCityList())
@@ -53,8 +54,14 @@ app.get(
   )
 );
 
+app.get('/list/get/', async (req, res, next) => {
+  getClearCityList().then(list => {
+    res.json(list);
+  });
+});
+
 app.get('/', (req, res) => {
-  res.sendState(202);
+  res.sendStatus(200);
 });
 
 // Start the app and listen on port 3000
