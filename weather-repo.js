@@ -4,7 +4,6 @@ const dateFormat = 'DD-MM-YYYY';
 
 const getClearCityList = () => {
   return new Promise((res, rej) => {
-    var currentDate = moment().format(dateFormat);
     var comingSaturday = moment()
       .day(6)
       .format(dateFormat);
@@ -12,11 +11,14 @@ const getClearCityList = () => {
       .day(7)
       .format(dateFormat);
 
-    const row = [currentDate, comingSaturday, comingSunday];
+    const row = [comingSaturday, comingSunday];
 
     const sql = `SELECT "city" FROM weathers 
-                  WHERE "currentDate" = $1 
-                  AND ("forecastDate" = $2 OR "forecastDate" = $3) 
+                  WHERE "currentDate" = 
+                      (SELECT MAX("currentDate") 
+                       FROM weathers 
+                       WHERE "forecastDate" = $1 OR  "forecastDate" = $2) 
+                  AND ("forecastDate" = $1 OR "forecastDate" = $2) 
                   AND "conditions" = 'Clear' 
                   ORDER BY high DESC`;
 
